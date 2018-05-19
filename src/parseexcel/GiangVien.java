@@ -18,14 +18,14 @@ public class GiangVien {
     private String gvName;
     
     private List<String> feedBack;
-    private List<HashMap<String, String>> subject;
+    private HashMap<String, String> subject;
     private int [] academicStreight;
     private int [] present;
     
     public GiangVien(){
         gvName = "";
         feedBack = new ArrayList<>();
-        subject = new ArrayList<HashMap<String,String>>();
+        subject = new HashMap<String,String>();
         academicStreight = new int [3]; 
         present = new int [3]; 
     }
@@ -65,11 +65,11 @@ public class GiangVien {
         return feedBack;
     }
 
-    public List<HashMap<String, String>> getSubject() {
+    public HashMap<String, String> getSubject() {
         return subject;
     }
 
-    public void setSubject(List<HashMap<String, String>> subject) {
+    public void setSubject(HashMap<String, String> subject) {
         this.subject = subject;
     }
 

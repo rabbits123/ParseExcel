@@ -97,7 +97,7 @@ public class ParseExcel {
                     
                     gv.setGvName(GVName);
                     gv.setFeedBack(feedback);
-                    gv.setSubject(subject);
+                    gv.setSubject((HashMap<String, String>) subject);
                     gv.getAcademicStreight()[aca]++;
                     gv.getPresent()[pre]++;
                     
@@ -111,13 +111,11 @@ public class ParseExcel {
                     
                     // kiểm tra môn đó đã có chưa?
                     if(!gv.getSubject().containsKey(subjectCode)){
-                        
+                        gv.getSubject().put(subjectCode, subjectName);
                     }
-                            
-                    
+                    gv.getAcademicStreight()[aca]++;
+                    gv.getPresent()[pre]++;
                 }
-
-                // preprocess --> tokenize --> preprocess
             }
         } catch (FileNotFoundException ex) {
             System.out.println("Không tìm thấy file");
@@ -133,10 +131,7 @@ public class ParseExcel {
     }
 
     public static void main(String[] args) {
-        String s = "Kang is the shit. he yep he is \n nah this";
-        for (String str : Arrays.asList(s.split("\\. | \n"))) {
-            System.out.println(str);
-        }
+        getData("C:\\Users\\user\\ParseExcel\\KhaoSatMH.xls");
     }
 
 }
