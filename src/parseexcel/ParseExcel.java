@@ -24,13 +24,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class ParseExcel {
 
-    private static Map<String, List<String>> gv_feedback = new HashMap<>();
-    private static Map<String, List<String>> gv_other = new HashMap<>();
-
     private static List<GiangVien> gvList = new ArrayList<>();
-    
-    private static GiangVien getGV(List<GiangVien> giangVien, String name){
-        for(GiangVien gv : giangVien){
+
+    private static GiangVien getGV(List<GiangVien> giangVien, String name) {
+        for (GiangVien gv : giangVien) {
             if (gv.getGvName().equals(name)) {
                 return gv;
             }
@@ -46,74 +43,84 @@ public class ParseExcel {
             wb = new XSSFWorkbook(fis);
             XSSFSheet sheet1 = wb.getSheetAt(0);
             int end = sheet1.getLastRowNum();
-            for (int i = 0; i < end; i++) {
+            for (int i = 1; i < end; i++) {
+                System.out.println("Line  " + i);
                 List<String> otherAttributes = new ArrayList<String>();
 
                 String GVName = sheet1.getRow(i).getCell(4).getStringCellValue();
                 String subjectCode = sheet1.getRow(i).getCell(5).getStringCellValue();
                 String subjectName = sheet1.getRow(i).getCell(6).getStringCellValue();
-                String sentence = sheet1.getRow(i).getCell(9).getStringCellValue()
-                        + sheet1.getRow(i).getCell(10).getStringCellValue();
 
-                String acaStreight = sheet1.getRow(i).getCell(7).getStringCellValue();
-                String present = sheet1.getRow(i).getCell(8).getStringCellValue();
+                String sentence1 = "";
+                String sentence2 = "";
 
-                int aca = -1;
-                switch (acaStreight) {
-                    case "Giỏi":
-                        aca = 0;
-                        break;
-                    case "Khá":
-                        aca = 1;
-                        break;
-                    case "Trung bình":
-                        aca = 2;
-                        break;
-                    case "Trung bình - Khá":
-                        aca = 3;
-                        break;
-                    case "Yếu":
-                        aca = 4;
-                        break;
+                try {
+                    sentence1 = sheet1.getRow(i).getCell(9).getStringCellValue();
+                    sentence2 = sheet1.getRow(i).getCell(10).getStringCellValue();
+                } catch (java.lang.NullPointerException e) {
+                    sentence1 = "";
+                    sentence2 = "";
+                } catch (java.lang.IllegalStateException e) {
+                    sentence1 = "";
+                    sentence2 = "";
                 }
 
+                String present = sheet1.getRow(i).getCell(8).getStringCellValue();
+                System.out.println(present);
                 int pre = -1;
-                switch (present) {
-                    case "<50%":
-                        pre = 0;
-                    case "50-80%":
+
+                if (present.equals("<50%")) {
+                    pre = 0;
+                } else {
+                    if (present.equals("50-80%")) {
                         pre = 1;
-                    case ">80%":
-                        pre = 2;
+                    } else {
+                        if (present.equals(">80%")) {
+                            pre = 2;
+                        }
+                    }
                 }
 
                 // Nếu chưa có GV trong gvList
                 if (getGV(gvList, GVName) == null) {
                     GiangVien gv = new GiangVien();
-                    
-                    List<String> feedback = Arrays.asList(sentence.split("\\.|\n"));
+
+                    ArrayList<String> feedback1 = new ArrayList<String>(Arrays.asList(sentence1.split("\\.|\n")));
+                    ArrayList<String> feedback2 = new ArrayList<String>(Arrays.asList(sentence2.split("\\.|\n")));
+                    feedback1.addAll(feedback2);
+
                     Map<String, String> subject = new HashMap<>();
                     subject.put(subjectCode, subjectName);
-                    
+
                     gv.setGvName(GVName);
-                    gv.setFeedBack(feedback);
+                    if (feedback1.size() != 0) {
+                        gv.setFeedBack(feedback1);
+                    }
                     gv.setSubject((HashMap<String, String>) subject);
-                    gv.getAcademicStreight()[aca]++;
+                    //gv.getAcademicStreight()[aca]++;
                     gv.getPresent()[pre]++;
-                    
+
                     gvList.add(gv);
-                } else{
+                } else {
                     GiangVien gv = getGV(gvList, GVName);
-                    
-                    List<String> feedback = gv.getFeedBack();
-                    feedback.addAll(Arrays.asList(sentence.split("\\.|\n")));
+
+                    ArrayList<String> feedback = gv.getFeedBack();
+
+                    ArrayList<String> feedback1 = new ArrayList<String>(Arrays.asList(sentence1.split("\\.|\n")));
+                    ArrayList<String> feedback2 = new ArrayList<String>(Arrays.asList(sentence2.split("\\.|\n")));
+                    feedback1.addAll(feedback2);
+
+                    if (feedback1.size() != 0) {
+                        feedback.addAll(feedback1);
+                    }
+
                     gv.setFeedBack(feedback);
-                    
+
                     // kiểm tra môn đó đã có chưa?
-                    if(!gv.getSubject().containsKey(subjectCode)){
+                    if (!gv.getSubject().containsKey(subjectCode)) {
                         gv.getSubject().put(subjectCode, subjectName);
                     }
-                    gv.getAcademicStreight()[aca]++;
+                    //gv.getAcademicStreight()[aca]++;
                     gv.getPresent()[pre]++;
                 }
             }
@@ -131,7 +138,16 @@ public class ParseExcel {
     }
 
     public static void main(String[] args) {
-        getData("C:\\Users\\user\\ParseExcel\\KhaoSatMH.xls");
+        getData("KhaoSat.xlsx");
+        System.out.println(gvList.size());
+
+        for (GiangVien gv : gvList) {
+            gv.printName();
+            gv.printSubject();
+            gv.printPresent();
+            gv.printFeedback();
+        }
+
     }
 
 }
